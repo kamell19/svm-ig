@@ -9,14 +9,18 @@ from werkzeug.security import check_password_hash
 
 
 def get_db_connection():
-    db_settings = st.secrets["mysql"]  # Mengambil data dari Streamlit Secrets
-    
-    return mysql.connector.connect(
-        host=db_settings["host"],
-        user=db_settings["user"],
-        password=db_settings["password"],
-        database=db_settings["database"]
-    )
+    try:
+        db_settings = st.secrets["mysql"]
+        conn = mysql.connector.connect(
+            host=db_settings["host"],
+            user=db_settings["user"],
+            password=db_settings["password"],
+            database=db_settings["database"]
+        )
+        return conn
+    except mysql.connector.Error as e:
+        st.error(f"Database connection failed: {e}")
+        return None
 
 # Fungsi autentikasi admin
 def authenticate(username, password):
